@@ -7,6 +7,7 @@ const AudioPlayer = ({ source }) => {
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
+  const [showVolumeToast, setShowVolumeToast] = useState(false);
 
   useEffect(() => {
     let soundInstance = new Audio.Sound();
@@ -55,6 +56,9 @@ const AudioPlayer = ({ source }) => {
     const nextVolume = Math.min(1, Math.max(0, volume + delta));
     setVolume(nextVolume);
     await sound.setVolumeAsync(nextVolume);
+    setShowVolumeToast(true);
+    clearTimeout(adjustVolume._t);
+    adjustVolume._t = setTimeout(() => setShowVolumeToast(false), 800);
   };
 
   return (
@@ -80,6 +84,11 @@ const AudioPlayer = ({ source }) => {
           <Ionicons name="add-outline" size={20} color="#0B6E4F" />
         </Pressable>
       </View>
+      {showVolumeToast && (
+        <View style={styles.volumeToast} pointerEvents="none">
+          <Text style={styles.volumeText}>{Math.round(volume * 100)}%</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -114,6 +123,20 @@ const styles = StyleSheet.create({
   },
   playButton: {
     marginHorizontal: 18,
+  },
+  volumeToast: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  volumeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 

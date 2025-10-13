@@ -27,12 +27,12 @@ const TaskList = ({ tasks, onToggleTask, onUpdateTask, onDeleteTask, onAddTask }
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Lista de tareas</Text>
-      {/* Usamos FlatList para renderizar eficientemente la colección de tareas. Nos permite agregar, modificar o eliminar elementos del array y solo se vuelven a pintar los ítems que cambian, lo que mantiene la UI fluida incluso con muchas tareas. */}
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         ListEmptyComponent={<Text style={styles.empty}>Agrega tu primera tarea.</Text>}
+        scrollEnabled={false}
       />
       <Pressable style={styles.addTask} onPress={onAddTask}>
         <Ionicons name="add-circle-outline" size={20} color="#0B6E4F" />

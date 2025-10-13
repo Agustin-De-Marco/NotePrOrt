@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import NotesScreen from '../screens/NotesScreen';
-import ClipboardScreen from '../screens/ClipboardScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -35,7 +34,6 @@ const AppNavigator = () => (
         tabBarIcon: ({ color, size }) => {
           const iconMap = {
             Inicio: 'grid-outline',
-            Portapapeles: 'clipboard-outline',
           };
           const name = iconMap[route.name] || 'ellipse-outline';
           return <Ionicons name={name} size={size} color={color} />;
@@ -51,7 +49,6 @@ const AppNavigator = () => (
       })}
     >
       <Tab.Screen name="Inicio" component={NotesStack} />
-      <Tab.Screen name="Portapapeles" component={ClipboardScreen} />
     </Tab.Navigator>
   </NavigationContainer>
 );

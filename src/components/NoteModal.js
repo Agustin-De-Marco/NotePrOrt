@@ -4,11 +4,11 @@ import {
   Image,
   Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
+  FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
@@ -160,11 +160,33 @@ const NoteModal = ({ visible, note, onClose, onSave, onDelete }) => {
     }
   };
 
+  const handleRemoveImage = (imageId) => {
+    setImages((prev) => prev.filter((img) => img.id !== imageId));
+  };
+
+  const handleRemoveAudio = (audioId) => {
+    setAudios((prev) => prev.filter((a) => a.id !== audioId));
+  };
+
   const renderImages = () =>
-    images.map((image) => <Image key={image.id} source={{ uri: image.uri }} style={styles.image} />);
+    images.map((image) => (
+      <View key={image.id} style={styles.mediaWrapper}>
+        <Image source={{ uri: image.uri }} style={styles.image} />
+        <Pressable style={styles.trashBadge} onPress={() => handleRemoveImage(image.id)}>
+          <Ionicons name="trash-bin-outline" size={16} color="#FFFFFF" />
+        </Pressable>
+      </View>
+    ));
 
   const renderAudios = () =>
-    audios.map((audio) => <AudioPlayer key={audio.id} source={audio} />);
+    audios.map((audio) => (
+      <View key={audio.id} style={styles.mediaWrapper}>
+        <AudioPlayer source={audio} />
+        <Pressable style={styles.trashBadge} onPress={() => handleRemoveAudio(audio.id)}>
+          <Ionicons name="trash-bin-outline" size={16} color="#FFFFFF" />
+        </Pressable>
+      </View>
+    ));
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose} presentationStyle="pageSheet">
@@ -184,39 +206,47 @@ const NoteModal = ({ visible, note, onClose, onSave, onDelete }) => {
           </View>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <TextInput
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Título"
-            style={styles.titleInput}
-          />
-          <View style={styles.bodyHeader}>
-            <Text style={styles.sectionTitle}>Contenido</Text>
-            <Pressable onPress={handlePaste} style={styles.pasteButton}>
-              <Ionicons name="clipboard-outline" size={18} color="#0B6E4F" />
-              <Text style={styles.pasteText}>Pegar</Text>
-            </Pressable>
-          </View>
-          <TextInput
-            value={body}
-            onChangeText={setBody}
-            placeholder="Escribe lo que quieras recordar..."
-            style={styles.bodyInput}
-            multiline
-          />
-          {renderImages()}
-          {renderAudios()}
-          {tasks.length > 0 && (
-            <TaskList
-              tasks={tasks}
-              onToggleTask={handleToggleTask}
-              onUpdateTask={handleUpdateTask}
-              onDeleteTask={handleDeleteTask}
-              onAddTask={handleAddTask}
-            />
-          )}
-        </ScrollView>
+        <FlatList
+          data={[]}
+          keyExtractor={(_, idx) => String(idx)}
+          ListHeaderComponent={
+            <View>
+              <TextInput
+                value={title}
+                onChangeText={setTitle}
+                placeholder="Título"
+                style={styles.titleInput}
+              />
+              <View style={styles.bodyHeader}>
+                <Text style={styles.sectionTitle}>Contenido</Text>
+                <Pressable onPress={handlePaste} style={styles.pasteButton}>
+                  <Ionicons name="clipboard-outline" size={18} color="#0B6E4F" />
+                  <Text style={styles.pasteText}>Pegar</Text>
+                </Pressable>
+              </View>
+              <TextInput
+                value={body}
+                onChangeText={setBody}
+                placeholder="Escribe lo que quieras recordar..."
+                style={styles.bodyInput}
+                multiline
+              />
+              {renderImages()}
+              {renderAudios()}
+              {tasks.length > 0 && (
+                <TaskList
+                  tasks={tasks}
+                  onToggleTask={handleToggleTask}
+                  onUpdateTask={handleUpdateTask}
+                  onDeleteTask={handleDeleteTask}
+                  onAddTask={handleAddTask}
+                />
+              )}
+            </View>
+          }
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        />
 
         <View style={styles.toolbar}>
           <ActionButton icon="copy-outline" label="Copiar" onPress={handleCopy} />
@@ -309,6 +339,25 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     width: '100%',
     height: 200,
+  },
+  mediaWrapper: {
+    position: 'relative',
+  },
+  trashBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#E23E57',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
   },
   toolbar: {
     position: 'absolute',
